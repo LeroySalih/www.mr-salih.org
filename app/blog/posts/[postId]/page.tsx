@@ -9,6 +9,7 @@ import rehypeRaw from 'rehype-raw'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolink from 'rehype-autolink-headings'
 import rehypeStringify from 'rehype-stringify'
+import Link from 'next/link'
 
 const POSTS_DIR = path.join(process.cwd(), 'app', 'blog', 'posts')
 
@@ -27,7 +28,12 @@ export default async function Page({ params }: { params: { postId: string } | Pr
   const mdPath = path.join(POSTS_DIR, postId, 'page.md')
   try {
     const raw = await fs.readFile(mdPath, 'utf8')
-    const parsed = matter(raw)
+    // If the markdown file was accidentally wrapped in a code-fence (e.g. ```markdown ... ```)
+    // strip the outer fence so gray-matter can parse YAML frontmatter correctly.
+    const fenceRe = /^`{3,}[^\n]*\n([\s\S]*?)\n`{3,}\s*$/
+    const fenceMatch = raw.match(fenceRe)
+    const contentToParse = fenceMatch ? fenceMatch[1] : raw
+    const parsed = matter(contentToParse)
     const processed = await unified()
       .use(remarkParse as any)
       .use(remarkGfm as any)
@@ -39,10 +45,27 @@ export default async function Page({ params }: { params: { postId: string } | Pr
       .process(parsed.content)
     const html = String(processed)
     const title = parsed.data?.title ?? postId
+    const createdDate = parsed.data?.date ?? parsed.data?.created ?? null
 
     return (
       <main>
-        <article className="prose" dangerouslySetInnerHTML={{ __html: html }} />
+        <nav aria-label="Breadcrumb" className="mb-4 text-sm" style={{ fontFamily: "'Courier New', Courier, monospace" }}>
+          <ol className="flex items-center space-x-42 text-gray-600 font-sans">
+            <li>
+              <Link href="/" className="hover:underline">Home</Link>
+            </li>
+            <li className="text-gray-400 ml-4"> &gt; </li>
+            <li>
+              <Link href="/blog" className="hover:underline">Blog</Link>
+            </li>
+            <li className="text-gray-400 ml-4"> &gt; </li>
+            <li aria-current="page" className="text-gray-900">{title}</li>
+          </ol>
+        </nav>
+
+        <article className="prose">
+          <div dangerouslySetInnerHTML={{ __html: html }} />
+        </article>
       </main>
     )
   } catch (e) {

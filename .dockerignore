@@ -1,0 +1,10 @@
+node_modules
+.next
+dist
+.git
+Dockerfile
+docker-compose.yaml
+npm-debug.log
+.env
+README.md
+public/**/*.map
