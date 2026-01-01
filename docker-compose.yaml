@@ -1,12 +1,15 @@
-version: "3.8"
-
 services:
   web:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     image: mr-salih-www:latest
+    container_name: mr-salih-www
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-    restart: unless-stopped
-    command: ["npm", "run", "start"]
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+

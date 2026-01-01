@@ -1,25 +1,52 @@
+# --- STAGE 1: Dependencies ---
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package files for caching
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# --- STAGE 2: Builder ---
 FROM node:20-alpine AS builder
 WORKDIR /app
-
-# Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm ci --silent
-
-# Copy sources and build
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Disable telemetry during the build
+ENV NEXT_TELEMETRY_DISABLED 1
+
 RUN npm run build
 
+# --- STAGE 3: Runner ---
 FROM node:20-alpine AS runner
 WORKDIR /app
-ENV NODE_ENV=production
 
-# Copy only what we need to run
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+# Create a non-root user for better security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy necessary files from the builder
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./next.config.js
+
+# Set the correct permission for prerender cache
+RUN mkdir .next
+RUN chown nextjs:nodejs .next
+
+# Automatically leverages output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+ENV PORT 3000
+ENV HOSTNAME "0.0.0.0"
+
+# Use server.js created by Next.js standalone output
+CMD ["node", "server.js"]
