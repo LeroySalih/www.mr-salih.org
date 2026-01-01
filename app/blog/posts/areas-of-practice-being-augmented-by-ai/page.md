@@ -1,5 +1,6 @@
 ---
 title: "Areas of Practice Being Automated with AI"
+description: "Exploring how AI is augmenting and automating the daily operations and projects of teaching."
 author: "Leroy Salih"
 created: 2026-01-02
 tags: ["teaching", "practice", "ai"]

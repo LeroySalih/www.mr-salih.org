@@ -49,21 +49,25 @@ export default async function Page({ params }: { params: { postId: string } | Pr
 
     return (
       <main>
-        <nav aria-label="Breadcrumb" className="mb-4 text-sm" style={{ fontFamily: "'Courier New', Courier, monospace" }}>
-          <ol className="flex items-center space-x-42 text-gray-600 font-sans">
+        <nav aria-label="Breadcrumb" className="mb-6 text-sm">
+          <ol className="flex items-center space-x-2 text-slate-500">
             <li>
-              <Link href="/" className="hover:underline">Home</Link>
+              <Link href="/" className="hover:text-slate-700">Home</Link>
             </li>
-            <li className="text-gray-400 ml-4"> &gt; </li>
             <li>
-              <Link href="/blog" className="hover:underline">Blog</Link>
+              <span className="mx-2">/</span>
             </li>
-            <li className="text-gray-400 ml-4"> &gt; </li>
-            <li aria-current="page" className="text-gray-900">{title}</li>
+            <li>
+              <Link href="/blog" className="hover:text-slate-700">Blog</Link>
+            </li>
+            <li>
+              <span className="mx-2">/</span>
+            </li>
+            <li aria-current="page" className="text-slate-700 font-medium">{title}</li>
           </ol>
         </nav>
 
-        <article className="prose">
+        <article className="prose prose-lg max-w-prose">
           <div dangerouslySetInnerHTML={{ __html: html }} />
         </article>
       </main>

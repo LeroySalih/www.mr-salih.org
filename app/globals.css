@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent-green: #16a34a;
 }
 
 @theme inline {
@@ -21,9 +22,9 @@
 }
 
 body {
-  background: var(--background);
+  background: #f7faf9;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
 }
 
 /* Minimal prose styles to approximate Tailwind Typography plugin */
@@ -35,7 +36,7 @@ body {
   font-weight: 700;
   margin: 1.25rem 0 0.75rem;
   font-family: var(--font-roboto-condensed), Roboto, Arial, sans-serif;
-  color: #0b3d91;
+  color: var(--accent-green);
   display: block;
   width: 100%;
 }

@@ -1,6 +1,6 @@
 ---
 title: "Categories of AI in Classrooms"
-summary: "A test file, full of stuff"
+description: "A test file, full of stuff"
 author: "Leroy Salih"
 created: "2026-01-01" 
 tags: ["LLM", "Teaching"]
